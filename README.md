@@ -53,7 +53,7 @@ Help Hub bridges volunteers and organizations, enabling opportunity discovery an
 
 ## 🔗 Live Links
 
-- Frontend: https://minor-project-2-volunteer-opportunity-and-resource-21grrqsqk.vercel.app
+- Frontend: https://minor-project-2-rho.vercel.app/
 - Backend: https://minor-project-2-volunteer-opportunity.onrender.com/api
 
 ---
