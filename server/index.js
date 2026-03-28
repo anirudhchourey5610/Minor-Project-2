@@ -10,15 +10,32 @@ import communityTipRoutes from './routes/communityTips.js';
 
 dotenv.config();
 
-// Connect to MongoDB
-connectDB();
-
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+let connectionPromise;
+
+const ensureDatabaseConnection = async () => {
+  if (!connectionPromise) {
+    connectionPromise = connectDB();
+  }
+
+  await connectionPromise;
+};
+
+app.use(async (req, res, next) => {
+  try {
+    await ensureDatabaseConnection();
+    next();
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    res.status(500).json({ message: 'Database connection failed' });
+  }
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -32,8 +49,19 @@ app.get('/', (req, res) => {
   res.json({ message: 'Help Hub API is running' });
 });
 
-const PORT = process.env.PORT || 5000;
+if (process.env.VERCEL !== '1') {
+  const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+  ensureDatabaseConnection()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+      });
+    })
+    .catch((error) => {
+      console.error('Failed to start server:', error);
+      process.exit(1);
+    });
+}
+
+export default app;
